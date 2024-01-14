@@ -1,22 +1,36 @@
+use std::{
+    cell::UnsafeCell,
+    mem::MaybeUninit,
+    sync::atomic::{AtomicBool, Ordering},
+};
+
 pub struct Channel<T> {
-    queue: UnsafeCell<MaybeUninit<T>>,
-    item_ready: AtomicBool,
+    message: UnsafeCell<MaybeUninit<T>>,
+    ready: AtomicBool,
 }
 
 impl<T> Channel<T> {
     pub fn new() -> Self {
         Self {
-            queue: UnsafeCell::new(MaybeUninit::uninit()),
-            item_ready: AtomicBool::new(false),
+            message: UnsafeCell::new(MaybeUninit::uninit()),
+            ready: AtomicBool::new(false),
         }
     }
 
-    pub fn send(&self, message: T) {
-        todo!()
+    // Safety: Only call this once
+    pub unsafe fn send(&self, message: T) {
+        (*self.message.get()).write(message);
+        self.ready.store(true, Ordering::Release);
     }
 
-    pub fn receive(&self) -> T {
-        todo!()
+    pub fn is_ready(&self) -> bool {
+        self.ready.load(Ordering::Acquire)
+    }
+
+    // Safety: Only call this once,
+    // and only after is_ready() returns `true`
+    pub unsafe fn receive(&self) -> T {
+        (*self.message.get()).assume_init_read()
     }
 }
 

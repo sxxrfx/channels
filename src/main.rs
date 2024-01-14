@@ -1,5 +1,6 @@
 use std::{cell::UnsafeCell, mem::MaybeUninit, sync::atomic::AtomicBool};
 
+mod mutex_channel;
 mod unsafe_onshot_channel;
 
 fn main() {
