@@ -2,6 +2,8 @@ use std::thread;
 
 use onshot_channel::Channel;
 
+mod blocking_channel;
+mod borrow_sender_receiver_channel;
 mod mutex_channel;
 mod onshot_channel;
 mod sender_receiver_channel;
