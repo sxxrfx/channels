@@ -43,7 +43,7 @@ impl<T> Receiver<T> {
         self.channel.ready.load(Ordering::Relaxed)
     }
 
-    pub fn receive(&self) -> T {
+    pub fn receive(self) -> T {
         if !self.channel.ready.swap(false, Ordering::Acquire) {
             panic!("no message available!");
         }
